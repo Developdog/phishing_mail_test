@@ -56,7 +56,7 @@
     <div class="login-container">
         <h2>그룹웨어 로그인</h2>
         <form action="/Login_Finish" method="post">
-            <input type="hidden" name = "user_id" value="{{ user_id }}"> 접속사용자 ID : {{ user_id }} </input>
+            <input type="hidden" name="user_email" value="{{user_email}}">
 
             <label for="groupware_id">문서보안 ID:</label>
             <input type="text" name="groupware_id" required>

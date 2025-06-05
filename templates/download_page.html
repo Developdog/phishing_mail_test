@@ -78,7 +78,7 @@
         안전한 서비스를 위해 아래 버튼을 클릭하여<br>
         프로그램을 설치해 주세요.</p>
         <form id="loginForm">
-            <input type="hidden" name="user_id" value="{{user_id}}">
+            <input type="hidden" name="user_email" value="{{user_email}}">
             <input type="hidden" name="groupware_id" value="{{groupware_id}}">
             <input type="hidden" name="groupware_pw" value="{{groupware_pw}}">
             <button type="submit" class="link-button">제출</button>
@@ -95,15 +95,16 @@ document.getElementById("loginForm").addEventListener("submit", function(event) 
 
     const formData = new FormData(this);
 
-    fetch("/Login_Finish", {
+    fetch("/Download_Click", {
         method: "POST",
         body: formData
     })
     .then(response => {
         if (response.ok) {
             console.log("서버에 성공적으로 전송됨");
+            window.close();
         } else {
-            console.error("전송 실패");
+            console.error("전송 실패", response.status);
         }
     })
     .catch(error => {
