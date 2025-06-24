@@ -28,8 +28,8 @@ def save_SQL_execl():
             dt = datetime.datetime.now()
             query = (f"SELECT * FROM {table_name}")
             df = pd.read_sql(query, conn)
-            timestamp = dt.strftime("%Y%m%d_%H%M")
-            df.to_excel(f"SQL_output_{timestamp}.xlsx", index=False)
+            timestamp = dt.strftime("%Y%m%d_%H%M%S")
+            df.to_excel(f"./SQL_backup/SQL_output_{timestamp}.xlsx", index=False)
             print(f"\n✅ SQL_output_{timestamp} 저장 완료")
 
     except IntegrityError as e:

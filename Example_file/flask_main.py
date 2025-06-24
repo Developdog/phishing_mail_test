@@ -6,7 +6,6 @@ from celery_tasks import track_mail_open, track_site_open, track_login, track_do
 
 app = Flask(__name__)
 # logger = setup_logger('flask')
-
 # app.register_blueprint(routesBp)
 
 @app.route('/')
